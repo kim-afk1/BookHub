@@ -20,13 +20,12 @@ public class libraryBorrow extends JFrame {
         homeButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Pass the memberList to loginWindow
                 loginWindow dialog = new loginWindow("Log-in", memberList);
                 dialog.pack();
                 dialog.setLocationRelativeTo(libraryBorrow.this);
                 dialog.setVisible(true);
-                // Don't call System.exit here!
             }
         });
     }
 }
+
