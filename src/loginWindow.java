@@ -13,10 +13,12 @@ public class loginWindow extends JDialog {
     private JButton createAccountButton;
     private JLabel loginFeedback;
     private MemberList memberList;
+    private libraryBorrow homeScreen;
 
-    public loginWindow(String title, MemberList memberList) {
+    public loginWindow(String title, MemberList memberList, libraryBorrow homeScreen) {
         super();
         this.memberList = memberList;
+        this.homeScreen = homeScreen;
         setContentPane(contentPane);
         setModal(true);
         getRootPane().setDefaultButton(buttonOK);
@@ -69,9 +71,7 @@ public class loginWindow extends JDialog {
         Member member = memberList.findMember(username, password);
         if(member != null) {
             loginFeedback.setText("Login successful!");
-
-            // open home screen (wapakoy idea ani unsay design)
-
+            homeScreen.setCurrentMember(member);
             dispose();
         } else {
             loginFeedback.setText("Invalid username or password");
@@ -79,8 +79,6 @@ public class loginWindow extends JDialog {
     }
 
     private void onCancel() {
-        // add your code here if necessary
         dispose();
     }
-
 }
