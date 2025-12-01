@@ -25,7 +25,7 @@ public class Mp3PlayerGUI extends JFrame {
 
     public Mp3PlayerGUI() {
         super("Spootify");
-        setSize(400, 600);
+        setSize(650, 550);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setResizable(false);
@@ -62,8 +62,14 @@ public class Mp3PlayerGUI extends JFrame {
         add(songArtist);
 
         playbackSlider = new JSlider(JSlider.HORIZONTAL, 0, 100, 0);
-        playbackSlider.setBounds(getWidth()/2 - 300/2, 365, 300, 40);
+        playbackSlider.setBounds(getWidth()/2 - 300/2, 365, 300, 50);
         playbackSlider.setBackground(null);
+        playbackSlider.setOpaque(false);
+        playbackSlider.setFocusable(false);
+
+        CustomSliderUI customUI = new CustomSliderUI(playbackSlider);
+        playbackSlider.setUI(customUI);
+
         playbackSlider.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
@@ -152,9 +158,11 @@ public class Mp3PlayerGUI extends JFrame {
 
         playButton.setVisible(false);
         playButton.setEnabled(false);
+        playButton.setFocusable(false);
 
         pauseButton.setVisible(true);
         pauseButton.setEnabled(true);
+        pauseButton.setFocusable(false);
     }
 
     public void enablePlayButtonDisablePauseButton() {
@@ -176,6 +184,7 @@ public class Mp3PlayerGUI extends JFrame {
         JButton prevButton = new JButton(loadImage("src/assets/previous.png"));
         prevButton.setBorderPainted(false);
         prevButton.setBackground(null);
+        prevButton.setFocusable(false);
         prevButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -187,6 +196,7 @@ public class Mp3PlayerGUI extends JFrame {
         JButton playButton = new JButton(loadImage("src/assets/play.png"));
         playButton.setBorderPainted(false);
         playButton.setBackground(null);
+        playButton.setFocusable(false);
         playButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -212,6 +222,7 @@ public class Mp3PlayerGUI extends JFrame {
         JButton nextButton = new JButton(loadImage("src/assets/next.png"));
         nextButton.setBorderPainted(false);
         nextButton.setBackground(null);
+        nextButton.setFocusable(false);
         nextButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
