@@ -5,11 +5,23 @@ public class App {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                new Mp3PlayerGUI().setVisible(true);
+                // Create the main MP3 player GUI (initially hidden)
+                Mp3PlayerGUI mp3PlayerGUI = new Mp3PlayerGUI();
 
-                //Song song = new Song("src/assets/Kung Maging Akin Ka.mp3");
-                //System.out.println(song.getTitle());
-                //System.out.println(song.getArtist());
+                // Initialize member list
+                MemberList memberList = new MemberList();
+
+                // Add default admin account
+                Member adminAccount = new Member("admin", "admin@spootify.com", "admin");
+                memberList.addMember(adminAccount);
+
+                // Create and show login window
+                loginWindow loginDialog = new loginWindow("Login to Spootify", memberList, mp3PlayerGUI);
+                loginDialog.pack();
+                loginDialog.setLocationRelativeTo(null);
+                loginDialog.setVisible(true);
+
+                // Note: Mp3PlayerGUI will be shown after successful login
             }
         });
     }

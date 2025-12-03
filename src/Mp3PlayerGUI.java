@@ -19,6 +19,8 @@ public class Mp3PlayerGUI extends JFrame {
     private JFileChooser fileChooser;
     private JLabel songTitle;
     private JLabel songArtist;
+    private JLabel userLabel;
+    private Member currentMember;
 
     private JPanel playbackBtns;
     private JSlider playbackSlider;
@@ -41,8 +43,24 @@ public class Mp3PlayerGUI extends JFrame {
         addGUIComponents();
     }
 
+    public void setCurrentMember(Member member) {
+        this.currentMember = member;
+        if(userLabel != null) {
+            userLabel = new JLabel("Hello, " + currentMember.getUsername() + "!");
+        }
+    }
+
     private void addGUIComponents() {
         addToolbar();
+
+        // Add user label at top right
+        userLabel = new JLabel("Not logged in");
+        userLabel.setBounds(getWidth() - 200, 25, 190, 20);
+        userLabel.setFont(new Font("Dialog", Font.PLAIN, 12));
+        userLabel.setForeground(TEXT_COLOR);
+        userLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+        add(userLabel);
+
         JLabel songImage = new JLabel(loadImage("src/assets/record.png"));
         songImage.setBounds(0, 50, getWidth() - 20, 225);
         add(songImage);
@@ -148,6 +166,30 @@ public class Mp3PlayerGUI extends JFrame {
             }
         });
         playlistMenu.add(loadPlaylist);
+
+        // Add Account menu
+        JMenu accountMenu = new JMenu("Account");
+        menuBar.add(accountMenu);
+
+        JMenuItem logoutItem = new JMenuItem("Logout");
+        logoutItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int confirm = JOptionPane.showConfirmDialog(
+                        Mp3PlayerGUI.this,
+                        "Are you sure you want to logout?",
+                        "Logout",
+                        JOptionPane.YES_NO_OPTION
+                );
+
+                if(confirm == JOptionPane.YES_OPTION) {
+                    musicPlayer.stopSong();
+                    setVisible(false);
+                    System.exit(0);
+                }
+            }
+        });
+        accountMenu.add(logoutItem);
 
         add(toolBar);
     }
