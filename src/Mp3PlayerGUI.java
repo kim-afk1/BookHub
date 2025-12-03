@@ -26,7 +26,7 @@ public class Mp3PlayerGUI extends JFrame {
     private JSlider playbackSlider;
 
     public Mp3PlayerGUI() {
-        super("Spootify");
+        super("Swingify");
         setSize(650, 550);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
