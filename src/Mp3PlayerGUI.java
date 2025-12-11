@@ -3,11 +3,13 @@ import java.awt.*;
 
 public class Mp3PlayerGUI extends JFrame {
     private PlaybackController controller;
+    private AudioPlayer player;
     private Member currentMember;
     private JLabel userLabel;
 
     public Mp3PlayerGUI() {
         controller = new PlaybackController();
+        player = AudioPlayer.getInstance();
 
         setTitle("Music Player");
         setSize(1000, 650);
@@ -54,7 +56,13 @@ public class Mp3PlayerGUI extends JFrame {
                 JOptionPane.YES_NO_OPTION);
 
         if (confirm == JOptionPane.YES_OPTION) {
+            // Stop any playing music
+            player.stop();
+
+            // Clear the current member
             currentMember = null;
+
+            // Hide the music player window
             setVisible(false);
 
             // Show login window again

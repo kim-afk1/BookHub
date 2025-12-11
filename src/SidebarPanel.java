@@ -153,7 +153,10 @@ public class SidebarPanel extends JPanel {
     }
 
     private void showAllSongs() {
-        new AllSongsDialog(SwingUtilities.getWindowAncestor(this), library.getAllSongs()).setVisible(true);
+        // Pass the controller so songs can be played directly
+        new AllSongsDialog(SwingUtilities.getWindowAncestor(this),
+                library.getAllSongs(),
+                controller).setVisible(true);
     }
 
     private void refreshPlaylists() {

@@ -11,7 +11,7 @@ import javax.sound.sampled.*;
 import javax.imageio.ImageIO;
 import java.io.IOException;
 
-public class MainPanel extends JPanel implements PlaybackController.PlaybackListener {
+public class  MainPanel extends JPanel implements PlaybackController.PlaybackListener {
     private PlaybackController controller;
     private AudioPlayer player;
     private JLabel songNameLabel;

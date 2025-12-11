@@ -1,9 +1,12 @@
 import javax.swing.*;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.BufferedInputStream;
 import java.util.*;
 import javax.sound.sampled.*;
-import javazoom.jl.player.Player;
+import javazoom.jl.player.advanced.AdvancedPlayer;
+import javazoom.jl.player.advanced.PlaybackEvent;
+import javazoom.jl.player.advanced.PlaybackListener;
 
 public class AudioPlayer {
     private static AudioPlayer instance;
@@ -13,17 +16,21 @@ public class AudioPlayer {
     private long clipPosition = 0;
 
     // For MP3 files
-    private Player mp3Player;
+    private AdvancedPlayer mp3Player;
     private Thread mp3Thread;
     private File currentFile;
-    private long mp3Position = 0; // in milliseconds
-    private long mp3Duration = 0;
+    private long mp3StartFrame = 0;
+    private long mp3CurrentFrame = 0;
+    private long mp3TotalFrames = 0;
+    private volatile boolean mp3StopRequested = false;
 
     private boolean isPlaying = false;
     private boolean isPaused = false;
     private boolean isMp3 = false;
     private float volume = 0.8f;
     private List<PlayerListener> listeners = new ArrayList<>();
+
+    private static final int FRAMES_PER_SECOND = 38; // Approximate for MP3
 
     private AudioPlayer() {}
 
@@ -66,9 +73,14 @@ public class AudioPlayer {
 
     private void loadMP3(File file) throws Exception {
         try {
-            mp3Position = 0;
-            // Estimate duration (this is approximate)
-            mp3Duration = (long) (file.length() / 16); // Rough estimate: 128kbps MP3
+            mp3StartFrame = 0;
+            mp3CurrentFrame = 0;
+
+            // Estimate total frames based on file size
+            // Rough estimate: 128kbps MP3, 38 frames per second
+            long fileSizeInBytes = file.length();
+            mp3TotalFrames = (fileSizeInBytes * 38) / 16000; // Rough approximation
+
         } catch (Exception e) {
             throw new Exception("Failed to load MP3 file: " + e.getMessage());
         }
@@ -95,34 +107,64 @@ public class AudioPlayer {
     private void playMP3() {
         if (currentFile == null) return;
 
+        mp3StopRequested = false;
         mp3Thread = new Thread(() -> {
             try {
                 FileInputStream fis = new FileInputStream(currentFile);
+                BufferedInputStream bis = new BufferedInputStream(fis);
 
-                // Skip to saved position if paused
-                if (isPaused && mp3Position > 0) {
-                    long bytesToSkip = (long) (mp3Position * 16); // Approximate
-                    fis.skip(bytesToSkip);
-                }
+                mp3Player = new AdvancedPlayer(bis);
 
-                mp3Player = new Player(fis);
+                // Add playback listener to track frames
+                mp3Player.setPlayBackListener(new PlaybackListener() {
+                    @Override
+                    public void playbackFinished(PlaybackEvent evt) {
+                        if (!mp3StopRequested) {
+                            mp3CurrentFrame = mp3TotalFrames;
+                            isPlaying = false;
+                            notifyListeners();
+                        }
+                    }
 
-                long startTime = System.currentTimeMillis();
-                mp3Player.play();
+                    @Override
+                    public void playbackStarted(PlaybackEvent evt) {
+                        // Track starting frame
+                    }
+                });
 
-                if (isPlaying) {
-                    mp3Position = 0;
-                    isPlaying = false;
-                    notifyListeners();
-                }
+                // Play from the current frame position
+                int startFrame = (int) mp3StartFrame;
+                int endFrame = Integer.MAX_VALUE;
 
+                // Start a timer to update current position
+                javax.swing.Timer positionTimer = new javax.swing.Timer(100, e -> {
+                    if (isPlaying && !mp3StopRequested) {
+                        mp3CurrentFrame = mp3StartFrame +
+                                (long)((System.currentTimeMillis() - mp3PlayStartTime) * FRAMES_PER_SECOND / 1000);
+                        if (mp3CurrentFrame > mp3TotalFrames) {
+                            mp3CurrentFrame = mp3TotalFrames;
+                        }
+                    }
+                });
+                positionTimer.start();
+
+                mp3Player.play(startFrame, endFrame);
+
+                positionTimer.stop();
+
+                bis.close();
                 fis.close();
+
             } catch (Exception e) {
-                System.err.println("Error playing MP3: " + e.getMessage());
+                if (!mp3StopRequested) {
+                    System.err.println("Error playing MP3: " + e.getMessage());
+                }
             }
         });
         mp3Thread.start();
     }
+
+    private long mp3PlayStartTime = 0;
 
     public void pause() {
         if (isMp3) {
@@ -143,6 +185,7 @@ public class AudioPlayer {
     }
 
     private void pauseMP3() {
+        mp3StopRequested = true;
         if (mp3Player != null) {
             mp3Player.close();
             mp3Player = null;
@@ -150,6 +193,9 @@ public class AudioPlayer {
         if (mp3Thread != null) {
             mp3Thread.interrupt();
         }
+
+        // Save current position for resume
+        mp3StartFrame = mp3CurrentFrame;
     }
 
     public void stop() {
@@ -172,6 +218,7 @@ public class AudioPlayer {
     }
 
     private void stopMP3() {
+        mp3StopRequested = true;
         if (mp3Player != null) {
             mp3Player.close();
             mp3Player = null;
@@ -179,7 +226,8 @@ public class AudioPlayer {
         if (mp3Thread != null) {
             mp3Thread.interrupt();
         }
-        mp3Position = 0;
+        mp3StartFrame = 0;
+        mp3CurrentFrame = 0;
     }
 
     public boolean isPlaying() {
@@ -188,7 +236,9 @@ public class AudioPlayer {
 
     public long getCurrentPosition() {
         if (isMp3) {
-            return mp3Position * 1000; // Convert to microseconds
+            // Convert frames to microseconds
+            // Assuming ~38 frames per second
+            return (mp3CurrentFrame * 1000000) / FRAMES_PER_SECOND;
         } else {
             return clip != null ? clip.getMicrosecondPosition() : 0;
         }
@@ -196,7 +246,8 @@ public class AudioPlayer {
 
     public long getDuration() {
         if (isMp3) {
-            return mp3Duration * 1000; // Convert to microseconds
+            // Convert total frames to microseconds
+            return (mp3TotalFrames * 1000000) / FRAMES_PER_SECOND;
         } else {
             return clip != null ? clip.getMicrosecondLength() : 0;
         }
@@ -204,9 +255,23 @@ public class AudioPlayer {
 
     public void setPosition(long position) {
         if (isMp3) {
-            mp3Position = position / 1000; // Convert from microseconds
-            if (isPlaying) {
-                pause();
+            // Convert microseconds to frames
+            long targetFrame = (position * FRAMES_PER_SECOND) / 1000000;
+
+            boolean wasPlaying = isPlaying;
+
+            // Stop current playback
+            if (isPlaying || isPaused) {
+                pauseMP3();
+            }
+
+            // Set new start position
+            mp3StartFrame = targetFrame;
+            mp3CurrentFrame = targetFrame;
+
+            // Resume if it was playing
+            if (wasPlaying) {
+                mp3PlayStartTime = System.currentTimeMillis();
                 play();
             }
         } else {
@@ -229,7 +294,8 @@ public class AudioPlayer {
                 System.err.println("Volume control not supported");
             }
         }
-        // Note: JLayer doesn't support volume control easily
+        // Note: MP3 volume control requires different approach with JLayer
+        // For now, volume changes only affect WAV files
     }
 
     public float getVolume() {

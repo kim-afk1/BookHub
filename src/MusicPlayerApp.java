@@ -12,7 +12,7 @@ public class MusicPlayerApp {
             // Initialize member list with some default members (optional)
             MemberList memberList = new MemberList();
             // Add a test account
-            memberList.addMember(new Member("admin", "admin@musicplayer.com", "admin123"));
+            memberList.addMember(new Member("admin", "admin@musicplayer.com", "admin"));
 
             // Create the main music player GUI (hidden initially)
             Mp3PlayerGUI mp3PlayerGUI = new Mp3PlayerGUI();
