@@ -18,7 +18,7 @@ public class MusicPlayerApp {
             Mp3PlayerGUI mp3PlayerGUI = new Mp3PlayerGUI(memberList);
 
             // Show login window first
-            loginWindow login = new loginWindow("Music Player Login", memberList, mp3PlayerGUI);
+            loginWindow login = new loginWindow("Login to Swingify", memberList, mp3PlayerGUI);
             login.pack();
             login.setLocationRelativeTo(null);
             login.setVisible(true);

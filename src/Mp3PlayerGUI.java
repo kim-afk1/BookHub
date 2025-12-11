@@ -13,10 +13,16 @@ public class Mp3PlayerGUI extends JFrame {
         controller = new PlaybackController();
         player = AudioPlayer.getInstance();
 
-        setTitle("Music Player");
+        setTitle("Swingify");
         setSize(1000, 650);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
+
+        try {
+            setIconImage(new ImageIcon(getClass().getResource("/assets/disc.png")).getImage());
+        } catch (Exception e) {
+            System.err.println("Warning: Could not load icon: " + e.getMessage());
+        }
 
         setLayout(new BorderLayout());
 
