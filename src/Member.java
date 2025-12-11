@@ -7,8 +7,6 @@ public class Member implements Serializable {
     private final String name;
     private String email;
     private String password;
-    private String role;
-    private String badge;
 
     public Member(String name, String email, String password) {
         this.name = name;

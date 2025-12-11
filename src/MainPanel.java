@@ -55,13 +55,11 @@ public class  MainPanel extends JPanel implements PlaybackController.PlaybackLis
 
         JLabel discLabel = new JLabel();
 
-        // Try to load disc image with transparency support - bigger size
         try {
             BufferedImage img = ImageIO.read(new File("icons/disc.png"));
             Image scaledImg = img.getScaledInstance(300, 300, Image.SCALE_SMOOTH);
             discLabel.setIcon(new ImageIcon(scaledImg));
         } catch (Exception e) {
-            // Fallback to emoji if image not found
             discLabel.setText("💿");
             discLabel.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 180));
         }
@@ -95,7 +93,6 @@ public class  MainPanel extends JPanel implements PlaybackController.PlaybackLis
         progressSlider.setForeground(new Color(30, 215, 96));
         progressSlider.setFocusable(false); // Remove focus border
 
-        // Custom UI for green thumb
         progressSlider.setUI(new javax.swing.plaf.basic.BasicSliderUI(progressSlider) {
             @Override
             public void paintThumb(Graphics g) {

@@ -51,7 +51,6 @@ public class AllSongsDialog extends JDialog {
         songList.setSelectionBackground(new Color(50, 150, 50));
         songList.setSelectionForeground(Color.WHITE);
 
-        // Custom cell renderer for better appearance
         songList.setCellRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value,

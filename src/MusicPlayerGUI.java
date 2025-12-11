@@ -6,10 +6,10 @@ public class MusicPlayerGUI extends JFrame {
     private AudioPlayer player;
     private Member currentMember;
     private JLabel userLabel;
-    private MemberList memberList; // Store the member list
+    private MemberList memberList;
 
     public MusicPlayerGUI(MemberList memberList) {
-        this.memberList = memberList; // Keep reference to member list
+        this.memberList = memberList;
         controller = new PlaybackController();
         player = AudioPlayer.getInstance();
 
@@ -26,7 +26,7 @@ public class MusicPlayerGUI extends JFrame {
 
         setLayout(new BorderLayout());
 
-        // Add user info panel at the top
+        // user info
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.setBackground(new Color(25, 25, 25));
         topPanel.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
@@ -46,7 +46,7 @@ public class MusicPlayerGUI extends JFrame {
         add(new SidebarPanel(controller), BorderLayout.WEST);
         add(new MainPanel(controller), BorderLayout.CENTER);
 
-        // Don't show the window yet - wait for login
+        // hide gui if user is not logged in
         setVisible(false);
     }
 
@@ -64,17 +64,10 @@ public class MusicPlayerGUI extends JFrame {
                 JOptionPane.YES_NO_OPTION);
 
         if (confirm == JOptionPane.YES_OPTION) {
-            // Stop any playing music
             player.stop();
-
-            // Clear the current member
             currentMember = null;
-
-            // Hide the music player window
             setVisible(false);
-
-            // Show login window again with the SAME member list
-            loginWindow login = new loginWindow("Music Player Login", memberList, this);
+            loginWindow login = new loginWindow("Login to Swingify", memberList, this);
             login.pack();
             login.setLocationRelativeTo(null);
             login.setVisible(true);

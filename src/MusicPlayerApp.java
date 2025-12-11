@@ -9,15 +9,10 @@ public class MusicPlayerApp {
         }
 
         SwingUtilities.invokeLater(() -> {
-            // Initialize member list with some default members
             MemberList memberList = new MemberList();
-            // Add a test account
             memberList.addMember(new Member("admin", "admin@musicplayer.com", "admin"));
-
-            // Create the main music player GUI with the member list (hidden initially)
             MusicPlayerGUI mp3PlayerGUI = new MusicPlayerGUI(memberList);
 
-            // Show login window first
             loginWindow login = new loginWindow("Login to Swingify", memberList, mp3PlayerGUI);
             login.pack();
             login.setLocationRelativeTo(null);
