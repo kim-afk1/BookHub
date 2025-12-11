@@ -20,7 +20,12 @@ public class createAccount extends JDialog {
         setContentPane(contentPane);
         setModal(true);
         getRootPane().setDefaultButton(createCA);
-        setIconImage(new ImageIcon(getClass().getResource("/assets/icon.png")).getImage());
+
+        try {
+            setIconImage(new ImageIcon(getClass().getResource("/assets/disc.png")).getImage());
+        } catch (Exception e) {
+            System.err.println("Warning: Could not load icon: " + e.getMessage());
+        }
 
         createCA.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -49,37 +54,67 @@ public class createAccount extends JDialog {
     }
 
     private void onOK() {
-        String username = userFieldCA.getText();
-        String password = new String(passFieldCA.getPassword());
-        String confirmPassword = new String(confirmPassCA.getPassword());
-        String email = emailFieldCA.getText();
+        try {
+            String username = userFieldCA.getText().trim();
+            String password = new String(passFieldCA.getPassword());
+            String confirmPassword = new String(confirmPassCA.getPassword());
+            String email = emailFieldCA.getText().trim();
+            
+            feedback.setText(" ");
 
-        // check fields
-        if(username.isEmpty()) {
-            feedback.setText("Enter a username!");
-            return;
+            // field cehcker
+            if(username.isEmpty()) {
+                feedback.setText("Enter a username!");
+                return;
+            }
+
+            if(email.isEmpty()) {
+                feedback.setText("Enter an email address!");
+                return;
+            }
+
+            if(password.isEmpty()) {
+                feedback.setText("Create a password.");
+                return;
+            }
+
+            if(confirmPassword.isEmpty()) {
+                feedback.setText("Confirm your password.");
+                return;
+            }
+
+            if(!confirmPassword.equals(password)) {
+                feedback.setText("Passwords do not match!");
+                return;
+            }
+
+            if(!email.matches("^[\\w.-]+@[\\w.-]+\\.[a-zA-Z]{2,6}$")) {
+                feedback.setText("Invalid email format!");
+                return;
+            }
+
+            // Create new member
+            Member newMember = new Member(username, email, password);
+            memberList.addMember(newMember);
+
+            // Show success message
+            JOptionPane.showMessageDialog(this,
+                    "Account created successfully!\nUsername: " + username,
+                    "Success",
+                    JOptionPane.INFORMATION_MESSAGE);
+
+            // Close dialog
+            dispose();
+
+        } catch (Exception ex) {
+            // Catch any unexpected errors
+            feedback.setText("Error creating account!");
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this,
+                    "An error occurred: " + ex.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
         }
-
-        if(password.isEmpty()) {
-            feedback.setText("Create a password.");
-            return;
-        }
-
-        if(!confirmPassword.equals(password)) {
-            feedback.setText("Passwords do not match!");
-            return;
-        }
-
-        if(!email.matches("^[\\w.-]+@[\\w.-]+\\.[a-zA-Z]{2,6}$")) {
-            feedback.setText("Invalid email!");
-            return;
-        }
-
-        Member newMember = new Member(username, email, password);
-        memberList.addMember(newMember);
-
-        JOptionPane.showMessageDialog(this, "Account created successfully!");
-        dispose();
     }
 
     private void onCancel() {

@@ -11,7 +11,7 @@ public class Mp3PlayerGUI extends JFrame {
         controller = new PlaybackController();
         player = AudioPlayer.getInstance();
 
-        setTitle("Music Player");
+        setTitle("Swingify");
         setSize(1000, 650);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
@@ -40,6 +40,11 @@ public class Mp3PlayerGUI extends JFrame {
 
         // Don't show the window yet - wait for login
         setVisible(false);
+        try {
+            setIconImage(new ImageIcon(getClass().getResource("/assets/disc.png")).getImage());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void setCurrentMember(Member member) {
@@ -67,7 +72,7 @@ public class Mp3PlayerGUI extends JFrame {
 
             // Show login window again
             MemberList memberList = new MemberList();
-            loginWindow login = new loginWindow("Music Player Login", memberList, this);
+            loginWindow login = new loginWindow("Login to Swingify", memberList, this);
             login.pack();
             login.setLocationRelativeTo(null);
             login.setVisible(true);

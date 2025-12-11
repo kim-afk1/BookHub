@@ -25,9 +25,9 @@ public class loginWindow extends JDialog {
         getRootPane().setDefaultButton(buttonOK);
 
         try {
-            setIconImage(new ImageIcon(getClass().getResource("/assets/icon.png")).getImage());
+            setIconImage(new ImageIcon(getClass().getResource("/assets/disc.png")).getImage());
         } catch (Exception e) {
-            // Icon not found, continue without it
+            e.printStackTrace();
         }
 
         buttonOK.addActionListener(new ActionListener() {
@@ -78,11 +78,8 @@ public class loginWindow extends JDialog {
         Member member = memberList.findMember(username, password);
         if(member != null) {
             loginFeedback.setText("Login successful!");
-
-            // Set the current member in the MP3 player
             mp3PlayerGUI.setCurrentMember(member);
 
-            // Close login window first
             dispose();
 
             // Show the MP3 player and bring it to front
